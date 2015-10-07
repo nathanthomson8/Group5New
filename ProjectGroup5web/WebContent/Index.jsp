@@ -48,13 +48,6 @@ javax.naming.InitialContext, java.util.List, yahooFeed.Feed, data.access.*"%>
 		<div class = "text-center">
 			<form class="form-inline" id="liveData" action="CompanySymbolServlet" method="POST">
 	  			<div class="form-group">
-	    			<label for="market">Market: </label>
-	   			 	<select class="form-control" name="market">
-						<option value="" selected disabled>Please select</option>
-						<option>Market Name</option>
-					</select>
-	  			</div>
-	  			<div class="form-group">
 	    			<label for="company">Company: </label>
 	   			 	<select class="form-control" name="company" id="company" onChange="callStrategy()">
 						<option value="" selected disabled>Please select</option>
