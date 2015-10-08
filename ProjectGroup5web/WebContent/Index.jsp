@@ -30,7 +30,6 @@ javax.naming.InitialContext, java.util.List, yahooFeed.Feed, data.access.*"%>
 				<li class = "dropdown">
 					<a href = "#" class = "dropdown-toggle" data-toggle = "dropdown">Profile<b class = "caret"></b></a>
 					<ul class = "dropdown-menu">
-					<!-- <a href = "/BuildingBlock/addTCaseToQueue1.html">Trading History</a> -->
 						<li><a href = "/ProjectGroup5web/TradingHistory.jsp">Trading History</a></li>
 						<li><a href = "/ProjectGroup5web/Positions.jsp">Positions</a></li>
 					</ul>
@@ -83,7 +82,7 @@ javax.naming.InitialContext, java.util.List, yahooFeed.Feed, data.access.*"%>
 		%>
 	<div id="strategyDiv">
 	<div class="text-center">
-			<form class="form-inline" id="strategyform1" action="UpdateStrategyServlet">
+			<form class="form-inline" id="strategyform1" action="SetStrategyServlet">
 				<input type="hidden" name="company" value="<%=request.getParameter("company")%>">
 			  	<div class="form-group">
 			    	<label for="strategy">Strategy: </label>
@@ -167,7 +166,7 @@ javax.naming.InitialContext, java.util.List, yahooFeed.Feed, data.access.*"%>
 <script>
 $('#submitButton').click( function() {
     $.ajax({
-        url: 'UpdateStrategyServlet',
+        url: 'SetStrategyServlet',
         type: 'post',
         dataType: 'json',
         data: $('#strategy').serialize(),

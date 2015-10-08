@@ -18,11 +18,16 @@ import data.dataObjects.UserObject;
 import yahooFeed.Feed;
 
 public class TwoMovingAvg implements Runnable {
-	static Logger log = Logger.getLogger(TwoMovingAvg.class);
+	Logger log = Logger.getLogger(TwoMovingAvg.class);
 	
-	private static final int QUANTITY = 15000;
-	private static final int VALUESHORTAVERAGE = 4;
-	private static final int VALUELONGAVERAGE = 20;
+	public TwoMovingAvg(String name){
+		threadName = name;
+	    System.out.println("Creating " +  threadName );
+	}
+	
+	private final int QUANTITY = 15000;
+	private final int VALUESHORTAVERAGE = 4;
+	private final int VALUELONGAVERAGE = 20;
 	private double shortMovingAverage = 0;
 	private double longMovingAverage = 0;
 	private double pricePaid = 0;
@@ -32,6 +37,11 @@ public class TwoMovingAvg implements Runnable {
 	private double lossMarginOfInvestment = -3000;
 	private boolean bought = false;
 	private boolean sold = false;
+	private boolean suspended = false;
+	private boolean running = false;
+	public Thread t;
+	private String threadName;
+	
 	
 	private LinkedList<Double> shortlist = new LinkedList<>();
 	private LinkedList<Double> longlist = new LinkedList<>();
@@ -130,7 +140,7 @@ public class TwoMovingAvg implements Runnable {
 			}
 		}
 	
-	public static double calcLongMovingAverage(LinkedList<Double> lList){
+	public double calcLongMovingAverage(LinkedList<Double> lList){
 		double av = 0, total = 0;
 		for(int i = 0;i<lList.size();i++)
 		{
@@ -140,7 +150,7 @@ public class TwoMovingAvg implements Runnable {
         return av;
 	}
 	
-	public static double calcShortMovingAverage(LinkedList<Double> sList){
+	public double calcShortMovingAverage(LinkedList<Double> sList){
 		double av = 0, total = 0;
 		for(int i = 0;i<sList.size();i++)
 		{
@@ -178,5 +188,29 @@ public class TwoMovingAvg implements Runnable {
 		}
 		
 	}
-
+	
+	public void start (){
+		  System.out.println("Starting " +  threadName );
+		  if (t == null)
+		  {
+		     t = new Thread (this, threadName);
+		     t.start ();
+		     running = true;
+		  }
+	 }
+	
+	public boolean isRunning() {
+		return running;
+	}
+	public void setRunning(boolean running) {
+		this.running = running;
+	}
+	
+	public void suspend() {
+	     suspended = true;
+	}
+	public synchronized void resume() {
+	      suspended = false;
+	      notify();
+	}
 }
