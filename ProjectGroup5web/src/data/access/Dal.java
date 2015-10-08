@@ -42,6 +42,67 @@ public class Dal {
 		return cn;
 	}
 	
+	
+	public static List<String> getTradeHistoryByCompany(String companySymbol) throws SQLException {
+		
+		List<String> history = new ArrayList<>();
+		
+		Connection cn = null;
+		
+		try {
+			cn = getConnection();
+			PreparedStatement st = cn.prepareStatement("SELECT c.CompanySymbol, s.BidPrice, s.AskPrice, t.Buy, t.TradeTime FROM Stocks s join TradeHistory t on s.StockID= t.StockID join Company c on s.CompanyID = c.CompanyID WHERE c.CompanySymbol = ?");
+			st.setString(1, companySymbol);
+			ResultSet rs = st.executeQuery();
+			
+			while (rs.next()) {
+				history.add((rs.getString(1) + ", " + rs.getDouble(2) + "," + rs.getDouble(3) + "," + rs.getString(4) + " , " + rs.getTimestamp(5)));
+			}
+			
+		}
+		catch (SQLException e) {
+			
+			log.info("Error getting trade history by Company: " +e.getMessage());
+		}
+		finally {
+			
+			if (cn != null) {
+				cn.close();
+			}
+		}
+		
+		return history;
+	}
+	
+	
+	public static List<String> getAllCompaniesWhereStrategyIsNotZero() throws SQLException {
+		
+		List<String> companies = new ArrayList<>();
+		Connection cn = null;
+		try {
+			cn = getConnection();
+			
+			PreparedStatement st = cn.prepareStatement("SELECT CompanySymbol FROM Company WHERE Strategy BETWEEN ? AND ?");
+			st.setInt(1, 1);
+			st.setInt(2, 3);
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				companies.add(rs.getString(1));
+			}
+			
+		} catch (SQLException e) {
+			log.info("Error retrieving Companies where strategies not equal to zero " +e.getMessage());
+		}
+		finally {
+			
+			if (cn != null) {
+				cn.close();
+			}
+		}
+
+		return companies;
+	}
+	
 public static List<String> getAllTrades() throws SQLException {
 		
 		List<String> trades = new ArrayList<>();
