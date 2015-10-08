@@ -82,7 +82,7 @@ javax.naming.InitialContext, java.util.List, yahooFeed.Feed, data.access.*"%>
 		%>
 	<div id="strategyDiv">
 	<div class="text-center">
-			<form class="form-inline" id="strategyform1" action="SetStrategyServlet">
+			<form class="form-inline" id="strategyform1" method="post">
 				<input type="hidden" name="company" value="<%=request.getParameter("company")%>">
 			  	<div class="form-group">
 			    	<label for="strategy">Strategy: </label>
@@ -170,7 +170,7 @@ $('#submitButton').click( function() {
         url: 'SetStrategyServlet',
         type: 'post',
         dataType: 'json',
-        data: $('#strategy').serialize(),
+        data: $('#strategyform1').serialize(),
         success: function(data) {
         	 $("#strategyDiv").load(window.location + " #strategy'");
                  }

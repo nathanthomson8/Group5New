@@ -11,6 +11,7 @@ import javax.naming.NamingException;
 import org.jboss.logging.Logger;
 
 import project.servlets.OrderManager;
+import project.servlets.OrderManager.OrderResult;
 import data.access.Dal;
 import data.dataObjects.CompanyObject;
 import data.dataObjects.StockObject;
@@ -58,7 +59,7 @@ public class TwoMovingAvg implements Runnable {
 	public void TwoMovingAverage(String compSymbol) throws InterruptedException, SQLException{
 		
 		TradeHistoryObject trade = null;
-		OrderManager om = null;
+		
 		//UserObject user = null;
 		
 	while(true){
@@ -101,15 +102,19 @@ public class TwoMovingAvg implements Runnable {
 						sold = true;
 						priceGot = stock.getBidPrice() * QUANTITY;
 						
-						om.sellOrder(symbol, stock.getBidPrice() , QUANTITY);
-						
+						try {
+							//OrderResult or = OrderManager.getInstance().sellOrder(symbol, stock.getBidPrice() , QUANTITY);
+						} catch (Exception e) {
+							log.error("Connection with order manager lost"+e.getMessage());
+						}
+							
 						Dal.addStock(stock);
 						stock.setStockID(Dal.getStockId(compSymbol));
 						
 						trade = new TradeHistoryObject();
 					
 						trade.setBought(false);
-						trade.setStockID(stock.getStockID());;
+						trade.setStockID(stock.getStockID());
 						trade.setTradeTime(now);
 						//trade.setUserObject(user);
 						
@@ -125,7 +130,12 @@ public class TwoMovingAvg implements Runnable {
 						bought = true;
 						pricePaid = stock.getAskPrice() * QUANTITY;
 						
-						om.buyOrder(symbol, stock.getAskPrice(), QUANTITY);
+						try {
+							//OrderResult or = OrderManager.getInstance().buyOrder(symbol, stock.getAskPrice(), QUANTITY);
+						}
+						catch (Exception e) {
+							log.error("Connection with order manager lost"+e.getMessage());
+						}
 						
 						Dal.addStock(stock);
 						stock.setStockID(Dal.getStockId(compSymbol));
