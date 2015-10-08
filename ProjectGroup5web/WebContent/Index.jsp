@@ -104,6 +104,7 @@ javax.naming.InitialContext, java.util.List, yahooFeed.Feed, data.access.*"%>
 				<h3>Current Strategy in place: </h3>
 				<h3><strong>Two Moving Averages</strong></h3>
 				<input type="hidden" name="company" value="<%=request.getParameter("company")%>">
+				<input type="hidden" name="stop" value="stop">
 			    <label for="submitButton1">
 			    	 Do you want to remove this Strategy?
 			   	</label>

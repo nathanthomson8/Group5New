@@ -40,8 +40,30 @@
 </div>
 <!--********************** END OF TOP NAVBAR **********************-->
 
+<div class = "container">
+<div class = "row">
+	<div class="col-md-6 panel panel-success">
+  		<div class="panel-heading">Trading History Ordered By Company</div>
+		  <div class="panel-body" id="tableHolder">
+			
+		</div>
+	</div>
+</div>
+</div>
 
 <script src= "http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <script src= "bootstrap/js/bootstrap.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+      refreshTable();
+    });
+
+    function refreshTable(){
+        $('#tableHolder').load('LiveTradeHistory.jsp', function(){
+           setTimeout(refreshTable, 20000);
+        });
+    }
+</script>
+
 </body>
 </html>

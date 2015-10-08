@@ -97,7 +97,7 @@ public class Feed {
 		}
         catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
-        	log.error("MalformedURLException:" + e.getMessage());
+        	log.error("Error getting feed" + e.getMessage());
 			e.printStackTrace();
 		} catch (ProtocolException e) {
 			// TODO Auto-generated catch block

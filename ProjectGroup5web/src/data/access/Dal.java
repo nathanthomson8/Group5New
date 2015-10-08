@@ -32,15 +32,45 @@ public class Dal {
 		catch (ClassNotFoundException e) {
 			
 			System.out.println("Class not found"+e);
-			log.info("Class not found"+e);
+			log.error("Class not found"+e);
 		}
 		catch (SQLException e) {
 			
 			System.out.println("SQL Exception: "+e);
-			log.info("SQL Exception: "+e);
+			log.error("SQL Exception: "+e);
 		}
 		return cn;
 	}
+	
+public static List<String> getAllTrades() throws SQLException {
+		
+		List<String> trades = new ArrayList<>();
+		String trade = null;
+		Connection cn = null;
+		try {
+			cn = getConnection();
+			
+			PreparedStatement st = cn.prepareStatement("SELECT CompanySymbol, BidPrice, AskPrice, Buy, TradeTime FROM TradeHistory"
+													 + " t JOIN Stocks s ON t.StockID = s.StockID JOIN Company c ON c.CompanyID = "
+													 + "s.CompanyID ORDER BY CompanySymbol");
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				trade =rs.getString(1)+","+rs.getDouble(2)+","+rs.getDouble(3)+","+rs.getBoolean(4)+","+rs.getTimestamp(5);
+				trades.add(trade);
+			}
+			
+		} catch (SQLException e) {
+			log.error("Error getting all trades "+e);
+		}
+		finally {
+			
+			if (cn != null) {
+				cn.close();
+			}
+		}
+
+	return trades;
+}
 
 	public static void addTradeHistory(TradeHistoryObject trade) throws SQLException {
 		
@@ -57,13 +87,13 @@ public class Dal {
 			int rows = st.executeUpdate();
 		
 			if (rows ==1) {
-				log.info("Trade History Added");
+				log.error("Trade History Added");
 			}
 		}
 		catch (SQLException e) {
 		
 			//System.out.println("Error getting data "+e);
-			log.info("Error adding trade "+e);
+			log.error("Error adding trade "+e);
 		}
 		finally {
 		
@@ -96,7 +126,7 @@ public static List<TradeHistoryObject> getTrades(String company) throws SQLExcep
 		}
 		catch (SQLException e) {
 			
-			log.info("Error getting list of trades "+e);
+			log.error("Error getting list of trades "+e);
 		}
 		finally {
 			
@@ -128,7 +158,7 @@ public static List<TradeHistoryObject> getTrades(String company) throws SQLExcep
 		}
 		catch (SQLException e) {
 		
-			log.info("Error adding Stock"+e);
+			log.error("Error adding Stock"+e);
 		}
 		finally {
 		
@@ -161,7 +191,7 @@ public static List<StockObject> getStocksByCompanySymbol(String company) throws 
 		}
 		catch (SQLException e) {
 			
-			log.info("Error getting list of Stock Objects "+e);
+			log.error("Error getting list of Stock Objects "+e);
 		}
 		finally {
 			
@@ -193,7 +223,7 @@ public static int getStockId(String company) throws SQLException {
 	}
 	catch (SQLException e) {
 		
-		log.info("Error getting Stock "+e);
+		log.error("Error getting Stock "+e);
 	}
 	finally {
 		
@@ -228,7 +258,7 @@ public static List<StockObject> getStocksByTradeHistory(int tradeId) throws SQLE
 	}
 	catch (SQLException e) {
 		
-		log.info("Error getting stocks by trade history "+e);
+		log.error("Error getting stocks by trade history "+e);
 	}
 	finally {
 		
@@ -256,7 +286,7 @@ public static int getStrategyByCompany(String symbol) throws SQLException {
 		}
 	}catch (SQLException e) {
 		
-		log.info("Error getting strategy by company "+e);
+		log.error("Error getting strategy by company "+e);
 	}
 	finally {
 		
@@ -282,7 +312,7 @@ public static List<CompanyObject> getAllCompanies() throws SQLException {
 		}
 		
 	} catch (SQLException e) {
-		log.info("Error getting all companies "+e);
+		log.error("Error getting all companies "+e);
 	}
 	finally {
 		
@@ -291,7 +321,34 @@ public static List<CompanyObject> getAllCompanies() throws SQLException {
 		}
 	}
 
-	return null;
+	return companies;
+}
+
+public static List<String> getAllCompaniesString() throws SQLException {
+	List<String> companies = new ArrayList<>();
+	String company;
+	Connection cn = null;
+	try {
+		cn = getConnection();
+		
+		PreparedStatement st = cn.prepareStatement("SELECT CompanySymbol FROM Company");
+		ResultSet rs = st.executeQuery();
+		while (rs.next()) {
+			company = rs.getString(1);
+			companies.add(company);
+		}
+		
+	} catch (SQLException e) {
+		log.error("Error getting all companies "+e);
+	}
+	finally {
+		
+		if (cn != null) {
+			cn.close();
+		}
+	}
+
+	return companies;
 }
 
 public static void addCompany(CompanyObject comp) throws SQLException {
@@ -312,7 +369,7 @@ public static void addCompany(CompanyObject comp) throws SQLException {
 	}
 	catch (SQLException e) {
 	
-		log.info("Error adding company "+e);
+		log.error("Error adding company "+e);
 	}
 	finally {
 	
@@ -339,7 +396,7 @@ public static int returnCompanyId(String company) throws SQLException {
 	}
 	catch (SQLException e) {
 		
-		log.info("Error getting company id "+e);
+		log.error("Error getting company id "+e);
 	}
 	finally {
 	
@@ -374,7 +431,7 @@ public static Boolean companyCheck(String company) throws SQLException {
 	}
 	catch (SQLException | NullPointerException e) {
 		
-		log.info("Error getting company "+e);
+		log.error("Error getting company "+e);
 		contains = false;
 	}
 	finally {
@@ -400,7 +457,7 @@ public static void updateStrategy(String comp, int strategy) throws SQLException
 		
 	} catch (SQLException | NullPointerException e) {
 		
-		log.info("Error setting new strategy value "+e);
+		log.error("Error setting new strategy value "+e);
 		
 	}
 	finally {
@@ -431,7 +488,7 @@ public static CompanyObject getCompanyByName(String company) throws SQLException
 	}
 	catch (SQLException e) {
 		
-		log.info("Error getting company id "+e);
+		log.error("Error getting company id "+e);
 	}
 	finally {
 	
