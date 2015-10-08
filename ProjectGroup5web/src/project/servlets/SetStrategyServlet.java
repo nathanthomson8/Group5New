@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -32,6 +34,17 @@ public class SetStrategyServlet extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
+    
+    public void init(ServletConfig config) throws ServletException {
+		// TODO Auto-generated method stub
+		super.init(config);
+		TwoMovingAvg twoMovingAvg = new TwoMovingAvg("Thread");
+		//yf.setMaverage(10);
+		//yf.start();
+		ServletContext ctx = getServletContext();
+		ctx.setAttribute("feed", twoMovingAvg);
+	}
+    
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -52,19 +65,25 @@ public class SetStrategyServlet extends HttpServlet {
 		String chosenStrat = request.getParameter("strategy");
 		System.out.println("Company name = " + company);
 		System.out.println("Chosen Strat = " + chosenStrat);
+		
 		try {
-			if(chosenStrat.equals("TwoMovingAvg")&&(Dal.getStrategyByCompany(company)!=1)){		
-				TwoMovingAvg newAvg = new TwoMovingAvg();
-				newAvg.setSymbol(company);
-				newAvg.run();
-				
+			ServletContext ctx = getServletContext();
+			TwoMovingAvg twoMovingAvg = (TwoMovingAvg)ctx.getAttribute("feed");
+			if(request.getParameter("stopgo").equals("stop")){
+				TwoMovingAvg.suspend();
 			}
-			// At the Minute Only have 1 Strategy, will add in else if for other strats
-			// whenever they are implemented
 			else{
-				//implement new strat
+				if(TwoMovingAvg.isRunning()){
+					TwoMovingAvg.resume();
+				}
+				else{
+					
+					TwoMovingAvg.start();
+				}
 				
 			}
+			
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
