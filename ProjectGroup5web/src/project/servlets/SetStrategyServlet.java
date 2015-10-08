@@ -68,6 +68,7 @@ public class SetStrategyServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		log.info("WE ARE IN doGet");
 		doPost(request,response);
 	}
 
@@ -76,6 +77,7 @@ public class SetStrategyServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		log.info("WE ARE IN doPost");
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		System.out.println("Strategy Servlet Entered");
@@ -84,6 +86,7 @@ public class SetStrategyServlet extends HttpServlet {
 		System.out.println("Company name = " + company);
 		//System.out.println("Chosen Strat = " + chosenStrat);
 		
+		if(company != null){
 		ServletContext ctx = getServletContext();
 		
 		HashMap<String, TwoMovingAvg> tradeThreads = (HashMap<String, TwoMovingAvg>) ctx.getAttribute("HashMap");
@@ -102,6 +105,7 @@ public class SetStrategyServlet extends HttpServlet {
 				}
 
 			}
+		}
 		
 			//out.print("");
 		RequestDispatcher rd = request.getRequestDispatcher("Index.jsp");
