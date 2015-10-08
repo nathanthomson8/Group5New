@@ -1,7 +1,11 @@
 package project.servlets;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -15,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.logging.Logger;
+
+import com.sun.org.apache.bcel.internal.generic.NEWARRAY;
 
 import project.businesslogic.TwoMovingAvg;
 import data.access.Dal;
@@ -38,11 +44,22 @@ public class SetStrategyServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
 		// TODO Auto-generated method stub
 		super.init(config);
-		TwoMovingAvg twoMovingAvg = new TwoMovingAvg("Thread");
+		List<String> companies = new ArrayList<>();
+		try {
+			companies = Dal.getAllCompaniesString();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			log.error("Error getting Company List"+e.getMessage());
+		}
+		HashMap<String, TwoMovingAvg> companyThreads = new HashMap<>();
+		for (String s : companies) {
+			companyThreads.put(s, new TwoMovingAvg(s));
+			System.out.println(s);
+		}
 		//yf.setMaverage(10);
 		//yf.start();
 		ServletContext ctx = getServletContext();
-		ctx.setAttribute("feed", twoMovingAvg);
+		ctx.setAttribute("HashMap", companyThreads);
 	}
     
 
@@ -60,35 +77,33 @@ public class SetStrategyServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.setContentType("text/html;charset=UTF-8");
+		PrintWriter out = response.getWriter();
 		System.out.println("Strategy Servlet Entered");
 		String company = request.getParameter("company");
-		String chosenStrat = request.getParameter("strategy");
+		//String chosenStrat = request.getParameter("strategy");
 		System.out.println("Company name = " + company);
-		System.out.println("Chosen Strat = " + chosenStrat);
+		//System.out.println("Chosen Strat = " + chosenStrat);
 		
-		try {
-			ServletContext ctx = getServletContext();
-			TwoMovingAvg twoMovingAvg = (TwoMovingAvg)ctx.getAttribute("feed");
-			if(request.getParameter("stopgo").equals("stop")){
-				TwoMovingAvg.suspend();
+		ServletContext ctx = getServletContext();
+		
+		HashMap<String, TwoMovingAvg> tradeThreads = (HashMap<String, TwoMovingAvg>) ctx.getAttribute("HashMap");
+
+		TwoMovingAvg twoMovingAvg = tradeThreads.get(company);
+		
+			if(request.getParameter("strategy").equals("stop")){
+				twoMovingAvg.suspend();
 			}
 			else{
-				if(TwoMovingAvg.isRunning()){
-					TwoMovingAvg.resume();
+				if(twoMovingAvg.isRunning()){
+					twoMovingAvg.resume();
 				}
-				else{
-					
-					TwoMovingAvg.start();
+				else{					
+					twoMovingAvg.start();
 				}
-				
+
 			}
-			
-			
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
+			//out.print("");
 		RequestDispatcher rd = request.getRequestDispatcher("Index.jsp");
 		rd.forward(request, response);
 	}	

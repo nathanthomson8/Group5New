@@ -65,9 +65,9 @@ public class CompanySymbolServlet extends HttpServlet {
 			stock = continuousFeed(company);
 		}
 		
-		TwoMovingAvg newAvg = new TwoMovingAvg();
-		newAvg.setSymbol(company);
-		newAvg.run();
+		//TwoMovingAvg newAvg = new TwoMovingAvg();
+		//newAvg.setSymbol(company);
+		//newAvg.run();
 		
 		//return to main Index.jsp
 		request.setAttribute("Stock", stock);

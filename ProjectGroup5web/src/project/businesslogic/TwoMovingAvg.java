@@ -10,6 +10,7 @@ import javax.naming.NamingException;
 
 import org.jboss.logging.Logger;
 
+import project.servlets.OrderManager;
 import data.access.Dal;
 import data.dataObjects.CompanyObject;
 import data.dataObjects.StockObject;
@@ -20,9 +21,14 @@ import yahooFeed.Feed;
 public class TwoMovingAvg implements Runnable {
 	Logger log = Logger.getLogger(TwoMovingAvg.class);
 	
+	public TwoMovingAvg() {
+		super();
+	}
+	
+	
 	public TwoMovingAvg(String name){
-		threadName = name;
-	    System.out.println("Creating " +  threadName );
+		symbol = name;
+	    log.info("Creating " +  symbol );
 	}
 	
 	private final int QUANTITY = 15000;
@@ -52,6 +58,7 @@ public class TwoMovingAvg implements Runnable {
 	public void TwoMovingAverage(String compSymbol) throws InterruptedException, SQLException{
 		
 		TradeHistoryObject trade = null;
+		OrderManager om = null;
 		//UserObject user = null;
 		
 	while(true){
@@ -90,9 +97,14 @@ public class TwoMovingAvg implements Runnable {
 				// difference was pos now neg.. e.g was above now below SELL
 				if(differenceLongShort.get(0) > 0 && differenceLongShort.get(1) < 0){
 					if(sold == false){
-						System.out.println("SELLLINGGGGGG");
+						log.info("SELLLINGGGGGG");
 						sold = true;
 						priceGot = stock.getBidPrice() * QUANTITY;
+						
+						om.sellOrder(symbol, stock.getBidPrice() , QUANTITY);
+						
+						Dal.addStock(stock);
+						stock.setStockID(Dal.getStockId(compSymbol));
 						
 						trade = new TradeHistoryObject();
 					
@@ -109,9 +121,15 @@ public class TwoMovingAvg implements Runnable {
 				// difference was neg now pos.. e.g was below now above BUY
 				else if(differenceLongShort.get(0) < 0 && differenceLongShort.get(1) > 0){
 					if(bought == false){
-						System.out.println("BUYYYYYINGGGGGG");
+						log.info("BUYYYYYINGGGGGG");
 						bought = true;
 						pricePaid = stock.getAskPrice() * QUANTITY;
+						
+						om.buyOrder(symbol, stock.getAskPrice(), QUANTITY);
+						
+						Dal.addStock(stock);
+						stock.setStockID(Dal.getStockId(compSymbol));
+						
 						trade = new TradeHistoryObject();
 						
 						trade.setBought(true);
@@ -165,35 +183,36 @@ public class TwoMovingAvg implements Runnable {
 		symbol = compSymbol;
 	}
 	
-	@Override
+	public String getSymbol() {
+		return symbol;
+	}
+	
 	public void run() {
 		log.info("Two Moving Average Started for: " + symbol);
 		try {
 			Dal.updateStrategy(symbol, 1);
 		} catch (SQLException e1) {
-			log.error("SQLException: " + e1.getMessage());
+			log.error("Setting strategy 1: " + e1.getMessage());
 			e1.printStackTrace();
 		}
 		try {
 			TwoMovingAverage(symbol);
 		} catch (InterruptedException | SQLException e) {
-			log.error("InterruptedException: " + e.getMessage());
-			e.printStackTrace();
+			log.error("ANY number of problems"+e.getMessage());
 		}
 		try {
 			Dal.updateStrategy(symbol, 0);
 		} catch (SQLException e1) {
-			log.error("SQLException: " + e1.getMessage());
+			log.error("Setting strategy 0: " + e1.getMessage());
 			e1.printStackTrace();
 		}
-		
 	}
 	
 	public void start (){
-		  System.out.println("Starting " +  threadName );
+		  log.info("Starting thread" +  symbol );
 		  if (t == null)
 		  {
-		     t = new Thread (this, threadName);
+		     t = new Thread (this, symbol);
 		     t.start ();
 		     running = true;
 		  }
@@ -202,6 +221,7 @@ public class TwoMovingAvg implements Runnable {
 	public boolean isRunning() {
 		return running;
 	}
+	
 	public void setRunning(boolean running) {
 		this.running = running;
 	}
